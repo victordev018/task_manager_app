@@ -1,0 +1,112 @@
+
+import React, { useState, useEffect } from 'react';
+import './TaskModal.css';
+
+const TaskModal = ({ isOpen, onClose, onSave, taskToEdit, serverError }) => {
+    const [formData, setFormData] = useState({
+        name: '',
+        cost: '',
+        deadline: ''
+    });
+
+    useEffect(() => {
+        if (taskToEdit) {
+            setFormData({
+                name: taskToEdit.name,
+                cost: taskToEdit.cost,
+                deadline: taskToEdit.deadline
+            });
+        } else {
+            setFormData({
+                name: '',
+                cost: '',
+                deadline: ''
+            });
+        }
+    }, [taskToEdit, isOpen]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onSave({
+            ...formData,
+            cost: parseFloat(formData.cost) // Ensure cost is a number
+        });
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="modal-overlay">
+            <div className="modal-content">
+                <h2>{taskToEdit ? 'Editar Tarefa' : 'Nova Tarefa'}</h2>
+
+                {serverError && (
+                    <div className="error-alert">
+                        {/* Display generic message or specific conflict message */}
+                        {serverError.message || 'Ocorreu um erro.'}
+
+                        {/* Display field specific 422 errors if available */}
+                        {serverError.errors && (
+                            <ul className="field-errors">
+                                {serverError.errors.map((err, idx) => (
+                                    <li key={idx}>{err.field}: {err.message}</li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                )}
+
+                <form onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label htmlFor="name">Nome da Tarefa</label>
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="cost">Custo (R$)</label>
+                        <input
+                            type="number"
+                            id="cost"
+                            name="cost"
+                            step="0.01"
+                            value={formData.cost}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="deadline">Data Limite</label>
+                        <input
+                            type="date"
+                            id="deadline"
+                            name="deadline"
+                            value={formData.deadline}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className="modal-actions">
+                        <button type="button" className="btn-cancel" onClick={onClose}>Cancelar</button>
+                        <button type="submit" className="btn-save">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
+
+export default TaskModal;
