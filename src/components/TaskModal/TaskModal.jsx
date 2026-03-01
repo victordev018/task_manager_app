@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './TaskModal.css';
 
 const TaskModal = ({ isOpen, onClose, onSave, taskToEdit, serverError }) => {
@@ -8,6 +7,9 @@ const TaskModal = ({ isOpen, onClose, onSave, taskToEdit, serverError }) => {
         cost: '',
         deadline: ''
     });
+
+    // 1. Criamos a referência para o input de nome
+    const nameInputRef = useRef(null);
 
     useEffect(() => {
         if (taskToEdit) {
@@ -25,6 +27,16 @@ const TaskModal = ({ isOpen, onClose, onSave, taskToEdit, serverError }) => {
         }
     }, [taskToEdit, isOpen]);
 
+    // 2. Efeito para focar no input quando o modal abrir
+    useEffect(() => {
+        if (isOpen && nameInputRef.current) {
+            // Um pequeno timeout garante que a animação/renderização do modal terminou
+            setTimeout(() => {
+                nameInputRef.current.focus();
+            }, 50);
+        }
+    }, [isOpen]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -37,7 +49,7 @@ const TaskModal = ({ isOpen, onClose, onSave, taskToEdit, serverError }) => {
         e.preventDefault();
         onSave({
             ...formData,
-            cost: parseFloat(formData.cost) // Ensure cost is a number
+            cost: parseFloat(formData.cost)
         });
     };
 
@@ -50,10 +62,7 @@ const TaskModal = ({ isOpen, onClose, onSave, taskToEdit, serverError }) => {
 
                 {serverError && (
                     <div className="error-alert">
-                        {/* Display generic message or specific conflict message */}
                         {serverError.message || 'Ocorreu um erro.'}
-
-                        {/* Display field specific 422 errors if available */}
                         {serverError.errors && (
                             <ul className="field-errors">
                                 {serverError.errors.map((err, idx) => (
@@ -74,6 +83,8 @@ const TaskModal = ({ isOpen, onClose, onSave, taskToEdit, serverError }) => {
                             value={formData.name}
                             onChange={handleChange}
                             required
+                            ref={nameInputRef} /* 3. Adicionamos a ref aqui */
+                            maxLength={255} /* 4. Trava de tamanho máximo */
                         />
                     </div>
                     <div className="form-group">
@@ -83,6 +94,7 @@ const TaskModal = ({ isOpen, onClose, onSave, taskToEdit, serverError }) => {
                             id="cost"
                             name="cost"
                             step="0.01"
+                            max="9999999999999" /* 5. Trava para evitar overflow no banco */
                             value={formData.cost}
                             onChange={handleChange}
                             required

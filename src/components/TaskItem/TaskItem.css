@@ -19,11 +19,16 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
+    overflow: hidden;
+    flex: 1;
+    margin-right: 12px;
 }
 
 .task-name {
     font-weight: 600;
     font-size: 1.1em;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .task-cost,

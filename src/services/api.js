@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'https://taskmanagerapi-production-5ed4.up.railway.app/api/tasks',
+    baseURL: 'https://taskmanagerapi-production-18aa.up.railway.app/api/tasks',
     timeout: 10000,
 });
 
