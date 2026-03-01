@@ -18,7 +18,7 @@ const TaskItem = ({ task, index, onEdit, onDelete, onMoveUp, onMoveDown, isFirst
                     style={provided.draggableProps.style}
                 >
                     <div className="task-info">
-                        <span className="task-name">{task.name}</span>
+                        <span className="task-name">#{task.id} - {task.name}</span>
                         <span className="task-cost">Custo: {formatCurrency(task.cost)}</span>
                         <span className="task-date">Prazo final: {formatDate(task.deadline)}</span>
                     </div>
